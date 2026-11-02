@@ -1,0 +1,40 @@
+name: Windows build
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore .\wetwiLAG.sln
+
+      - name: Build Release
+        run: dotnet build .\wetwiLAG.sln --configuration Release --no-restore
+
+      - name: Run read-only smoke tests
+        run: dotnet run --project .\Tests\wetwiLAG.SmokeTests.csproj --configuration Release --no-restore
+
+      - name: Publish self-contained Windows x64 executable
+        run: dotnet publish .\wetwiLAG.csproj --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none -p:DebugSymbols=false -o .\publish\win-x64
+
+      - name: Upload Windows x64 build
+        uses: actions/upload-artifact@v4
+        with:
+          name: wetwiLAG-win-x64
+          path: .\publish\win-x64\wetwiLAG.exe
+          if-no-files-found: error

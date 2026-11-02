@@ -1,0 +1,748 @@
+<Window x:Class="wetwiLAG.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:wetwiLAG.Models"
+        xmlns:infra="clr-namespace:wetwiLAG.Infrastructure"
+        mc:Ignorable="d"
+        Title="wetwiLAG"
+        Width="1440"
+        Height="900"
+        MinWidth="1040"
+        MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBackground}"
+        Foreground="{DynamicResource PrimaryText}"
+        Closing="Window_Closing">
+    <Window.Resources>
+        <infra:StateVisibilityConverter x:Key="StateVisibilityConverter" />
+        <infra:HexBrushConverter x:Key="HexBrushConverter" />
+        <infra:SectionVisibilityConverter x:Key="SectionVisibilityConverter" />
+        <Style x:Key="CardBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{DynamicResource PanelBackground}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="18" />
+            <Setter Property="Margin" Value="0,0,12,12" />
+        </Style>
+        <Style x:Key="SectionHeadingStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="23" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,5" />
+        </Style>
+        <Style x:Key="MutedTextStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{DynamicResource MutedText}" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+        <Style x:Key="CardTitleStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+        <Style x:Key="NavLabelStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.SidebarCollapsed, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="MainShell">
+        <Grid.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding Scale}" ScaleY="{Binding Scale}" />
+        </Grid.LayoutTransform>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding MainColumnZeroWidth}" />
+            <ColumnDefinition Width="{Binding MainColumnOneWidth}" />
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="{Binding SidebarColumnIndex}"
+                Background="{DynamicResource SidebarBackground}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,1,0"
+                Visibility="{Binding SidebarVisible, Converter={StaticResource StateVisibilityConverter}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="76" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid Margin="17,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="34" Height="34" CornerRadius="10" Background="{DynamicResource AccentSoftBrush}">
+                        <TextBlock Text="w" FontSize="23" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="9,0,0,0"
+                                Visibility="{Binding SidebarCollapsed, Converter={StaticResource StateVisibilityConverter}, ConverterParameter=Invert}">
+                        <TextBlock Text="wetwiLAG" FontWeight="Bold" FontSize="16" />
+                        <TextBlock Text="NETWORK CONTROL" FontSize="9" Foreground="{DynamicResource MutedText}" />
+                    </StackPanel>
+                </Grid>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10,9">
+                        <TextBlock Text="WORKSPACE" FontSize="10" Foreground="{DynamicResource MutedText}"
+                                   Margin="11,4,0,10"
+                                   Visibility="{Binding SidebarCollapsed, Converter={StaticResource StateVisibilityConverter}, ConverterParameter=Invert}" />
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Dashboard" ToolTip="Dashboard"
+                                AutomationProperties.Name="Dashboard navigation" Padding="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <TextBlock Text="◫" FontSize="16" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Dashboard" Style="{StaticResource NavLabelStyle}" />
+                            </Grid>
+                        </Button>
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Fortnite" ToolTip="Fortnite"
+                                AutomationProperties.Name="Fortnite navigation" Padding="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <TextBlock Text="◈" FontSize="16" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Fortnite" Style="{StaticResource NavLabelStyle}" />
+                            </Grid>
+                        </Button>
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Network" ToolTip="Network"
+                                AutomationProperties.Name="Network navigation" Padding="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <TextBlock Text="⌁" FontSize="18" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Network" Style="{StaticResource NavLabelStyle}" />
+                            </Grid>
+                        </Button>
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Routes" ToolTip="Routes"
+                                AutomationProperties.Name="Routes navigation" Padding="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <TextBlock Text="⇢" FontSize="18" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Routes" Style="{StaticResource NavLabelStyle}" />
+                            </Grid>
+                        </Button>
+                        <TextBlock Text="TOOLS" FontSize="10" Foreground="{DynamicResource MutedText}"
+                                   Margin="11,18,0,10"
+                                   Visibility="{Binding SidebarCollapsed, Converter={StaticResource StateVisibilityConverter}, ConverterParameter=Invert}" />
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Optimizer" ToolTip="Optimizer"
+                                AutomationProperties.Name="Optimizer navigation" Padding="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <TextBlock Text="⛭" FontSize="16" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Optimizer" Style="{StaticResource NavLabelStyle}" />
+                            </Grid>
+                        </Button>
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Profiles" ToolTip="Profiles"
+                                AutomationProperties.Name="Profiles navigation" Padding="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <TextBlock Text="▣" FontSize="16" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Profiles" Style="{StaticResource NavLabelStyle}" />
+                            </Grid>
+                        </Button>
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="History" ToolTip="History"
+                                AutomationProperties.Name="History navigation" Padding="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <TextBlock Text="◷" FontSize="16" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="History" Style="{StaticResource NavLabelStyle}" />
+                            </Grid>
+                        </Button>
+                        <TextBlock Text="PREFERENCES" FontSize="10" Foreground="{DynamicResource MutedText}"
+                                   Margin="11,18,0,10"
+                                   Visibility="{Binding SidebarCollapsed, Converter={StaticResource StateVisibilityConverter}, ConverterParameter=Invert}" />
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="Settings" ToolTip="Settings"
+                                AutomationProperties.Name="Settings navigation" Padding="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <TextBlock Text="⚙" FontSize="16" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Settings" Style="{StaticResource NavLabelStyle}" />
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+                <StackPanel Grid.Row="2" Margin="10,8">
+                    <Button Command="{Binding ToggleSidebarCollapsedCommand}" ToolTip="Collapse or expand navigation">
+                        <TextBlock Text="⇤" HorizontalAlignment="Center" />
+                    </Button>
+                    <Button Command="{Binding ToggleSidebarCommand}" ToolTip="Hide navigation">
+                        <TextBlock Text="Hide navigation" Style="{StaticResource NavLabelStyle}" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="{Binding ContentColumnIndex}" Background="{DynamicResource WindowBackground}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="76" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+                    Background="{DynamicResource WindowBackground}">
+                <Grid Margin="27,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding CurrentSection}" FontSize="20" FontWeight="SemiBold"
+                                   AutomationProperties.AutomationId="SectionTitle" />
+                        <TextBlock Text="{Binding SectionSubtitle}" Style="{StaticResource MutedTextStyle}" FontSize="12" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Command="{Binding ToggleSidebarCommand}" Content="Show / hide sidebar"
+                            VerticalAlignment="Center" Margin="8,0" />
+                    <Border Grid.Column="2" CornerRadius="16" Padding="10,6" Background="{DynamicResource AccentSoftBrush}"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="LIVE DIAGNOSTICS" Foreground="{DynamicResource AccentBrush}"
+                                   FontSize="10" FontWeight="SemiBold" />
+                    </Border>
+                </Grid>
+            </Border>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <Grid Margin="28,25">
+                    <Grid x:Name="DashboardPage" AutomationProperties.AutomationId="DashboardPage"
+                          Visibility="{Binding CurrentSection, Converter={StaticResource SectionVisibilityConverter}, ConverterParameter=Dashboard}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,17">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Network overview" AutomationProperties.AutomationId="DashboardHeading"
+                                               Style="{StaticResource SectionHeadingStyle}" />
+                                    <TextBlock Text="{Binding ConnectionStatus}" Style="{StaticResource MutedTextStyle}" />
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="Run 10-sample test" AutomationProperties.Name="Run 10-sample test"
+                                        Command="{Binding RunPingTestCommand}"
+                                        VerticalAlignment="Center" Background="{DynamicResource AccentSoftBrush}" />
+                            </Grid>
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,16" Padding="16">
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="210" /></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Probe host" VerticalAlignment="Center" Margin="0,0,14,0" />
+                                    <TextBox Grid.Column="1" Text="{Binding ProbeHostInput, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="0" AutomationProperties.Name="Probe host" />
+                                    <TextBlock Grid.Column="2" Text="{Binding ProbeTargetLabel}" Style="{StaticResource MutedTextStyle}"
+                                               VerticalAlignment="Center" Margin="14,0" />
+                                    <TextBlock Grid.Column="3" Text="{Binding PingSummary}" Style="{StaticResource MutedTextStyle}"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                            <ItemsControl x:Name="WidgetsList"
+                                          ItemsSource="{Binding VisibleWidgets}"
+                                          AllowDrop="True"
+                                          PreviewMouseLeftButtonDown="WidgetsList_PreviewMouseLeftButtonDown"
+                                          PreviewMouseMove="WidgetsList_PreviewMouseMove"
+                                          DragOver="WidgetsList_DragOver"
+                                          Drop="WidgetsList_Drop">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type models:DashboardWidget}">
+                                        <Border Style="{StaticResource CardBorderStyle}" Width="{Binding Width}" Height="174"
+                                                Margin="0,0,13,13" Padding="17" Cursor="SizeAll">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Icon}" Foreground="{DynamicResource AccentBrush}"
+                                                                   FontSize="17" Margin="0,0,9,0" />
+                                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <Button Grid.Column="1" Content="↔" ToolTip="Resize widget"
+                                                            Command="{Binding DataContext.ResizeWidgetCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                            CommandParameter="{Binding Id}" Padding="7,3" Margin="0,0,5,0" />
+                                                    <Button Grid.Column="2" Content="×" ToolTip="Hide widget"
+                                                            Command="{Binding DataContext.HideWidgetCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                            CommandParameter="{Binding Id}" Padding="8,3" Margin="0" />
+                                                </Grid>
+                                                <TextBlock Grid.Row="1" Text="{Binding Value}" FontSize="25" FontWeight="SemiBold"
+                                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Grid.Row="2" Text="{Binding Detail}" Style="{StaticResource MutedTextStyle}"
+                                                           FontSize="11" MaxHeight="34" TextTrimming="CharacterEllipsis" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="Drag cards to reorder. Use ↔ to resize and × to hide; hidden cards can be restored in Settings."
+                                       Style="{StaticResource MutedTextStyle}" Margin="0,2,0,16" />
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="Latest measured diagnostic" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="{Binding PingSummary}" />
+                                    <TextBlock Text="Latency, jitter and packet loss are based on ICMP replies to the probe host shown above. ICMP may be blocked; unavailable results are not estimated."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,7,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="FortnitePage" AutomationProperties.AutomationId="FortnitePage"
+                          Visibility="{Binding CurrentSection, Converter={StaticResource SectionVisibilityConverter}, ConverterParameter=Fortnite}">
+                        <StackPanel>
+                            <TextBlock Text="Fortnite process" AutomationProperties.AutomationId="FortniteHeading"
+                                       Style="{StaticResource SectionHeadingStyle}" />
+                            <TextBlock Text="Detection uses the running Windows process name. wetwiLAG does not inspect game memory, files, packets or anti-cheat."
+                                       Style="{StaticResource MutedTextStyle}" Margin="0,0,0,18" />
+                            <Border Style="{StaticResource CardBorderStyle}" MaxWidth="900" HorizontalAlignment="Left">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding FortniteStatus}" FontSize="22" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding FortniteConnectionStatus}" Margin="0,10,0,14" />
+                                    <Button Content="Check game process again" Command="{Binding RefreshFortniteCommand}"
+                                            HorizontalAlignment="Left" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}" MaxWidth="900" HorizontalAlignment="Left">
+                                <StackPanel>
+                                    <TextBlock Text="Connection diagnostics" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="{Binding ConnectionStatus}" />
+                                    <TextBlock Text="{Binding ProbeTargetLabel}" Style="{StaticResource MutedTextStyle}" Margin="0,6,0,12" />
+                                    <Button Content="Measure configured probe" Command="{Binding RunPingTestCommand}"
+                                            HorizontalAlignment="Left" />
+                                    <TextBlock Text="This measures the explicitly configured probe target; it is not a measurement of a Fortnite server and does not guarantee game connectivity."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,12,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="NetworkPage" AutomationProperties.AutomationId="NetworkPage"
+                          Visibility="{Binding CurrentSection, Converter={StaticResource SectionVisibilityConverter}, ConverterParameter=Network}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,17">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Network adapters" AutomationProperties.AutomationId="NetworkHeading"
+                                               Style="{StaticResource SectionHeadingStyle}" />
+                                    <TextBlock Text="Configuration is read from Windows network interfaces."
+                                               Style="{StaticResource MutedTextStyle}" />
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="Refresh adapters" Command="{Binding RefreshAdaptersCommand}"
+                                        VerticalAlignment="Center" />
+                            </Grid>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Selected interface" Style="{StaticResource CardTitleStyle}" />
+                                    <ComboBox ItemsSource="{Binding Adapters}" SelectedItem="{Binding SelectedAdapter}"
+                                              DisplayMemberPath="Name" />
+                                    <UniformGrid Columns="3" Margin="0,9,0,0">
+                                        <StackPanel Margin="0,0,12,13">
+                                            <TextBlock Text="STATUS" Style="{StaticResource MutedTextStyle}" />
+                                            <TextBlock Text="{Binding SelectedAdapter.Status}" Margin="0,5,0,0" />
+                                        </StackPanel>
+                                        <StackPanel Margin="0,0,12,13">
+                                            <TextBlock Text="DESCRIPTION" Style="{StaticResource MutedTextStyle}" />
+                                            <TextBlock Text="{Binding SelectedAdapter.Description}" Margin="0,5,0,0" />
+                                        </StackPanel>
+                                        <StackPanel Margin="0,0,12,13">
+                                            <TextBlock Text="LINK SPEED" Style="{StaticResource MutedTextStyle}" />
+                                            <TextBlock Text="{Binding SelectedAdapter.SpeedBitsPerSecond, StringFormat={}{0:N0} bps}" Margin="0,5,0,0" />
+                                        </StackPanel>
+                                        <StackPanel Margin="0,0,12,13">
+                                            <TextBlock Text="IPv4 ADDRESS" Style="{StaticResource MutedTextStyle}" />
+                                            <TextBlock Text="{Binding SelectedAdapter.IPv4Addresses}" Margin="0,5,0,0" />
+                                        </StackPanel>
+                                        <StackPanel Margin="0,0,12,13">
+                                            <TextBlock Text="DEFAULT GATEWAY" Style="{StaticResource MutedTextStyle}" />
+                                            <TextBlock Text="{Binding SelectedAdapter.Gateway}" Margin="0,5,0,0" />
+                                        </StackPanel>
+                                        <StackPanel Margin="0,0,12,13">
+                                            <TextBlock Text="DNS SERVERS" Style="{StaticResource MutedTextStyle}" />
+                                            <TextBlock Text="{Binding SelectedAdapter.DnsServers}" Margin="0,5,0,0" />
+                                        </StackPanel>
+                                        <StackPanel Margin="0,0,12,13">
+                                            <TextBlock Text="MTU (IPv4)" Style="{StaticResource MutedTextStyle}" />
+                                            <TextBlock Text="{Binding SelectedAdapter.Mtu, TargetNullValue=Unavailable}" Margin="0,5,0,0" />
+                                        </StackPanel>
+                                        <StackPanel Margin="0,0,12,13">
+                                            <TextBlock Text="INTERFACE TYPE" Style="{StaticResource MutedTextStyle}" />
+                                            <TextBlock Text="{Binding SelectedAdapter.InterfaceType}" Margin="0,5,0,0" />
+                                        </StackPanel>
+                                    </UniformGrid>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Connection test" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="{Binding ConnectionStatus}" />
+                                    <UniformGrid Columns="3" Margin="0,13">
+                                        <StackPanel><TextBlock Text="LATENCY" Style="{StaticResource MutedTextStyle}" /><TextBlock Text="{Binding LatencyLabel}" FontSize="18" Margin="0,4" /></StackPanel>
+                                        <StackPanel><TextBlock Text="JITTER" Style="{StaticResource MutedTextStyle}" /><TextBlock Text="{Binding JitterLabel}" FontSize="18" Margin="0,4" /></StackPanel>
+                                        <StackPanel><TextBlock Text="PACKET LOSS" Style="{StaticResource MutedTextStyle}" /><TextBlock Text="{Binding PacketLossLabel}" FontSize="18" Margin="0,4" /></StackPanel>
+                                    </UniformGrid>
+                                    <TextBlock Text="{Binding ProbeTargetLabel}" Style="{StaticResource MutedTextStyle}" />
+                                    <Button Content="Run 10 measured ping samples" AutomationProperties.Name="Run 10 measured ping samples"
+                                            Command="{Binding RunPingTestCommand}"
+                                            HorizontalAlignment="Left" Margin="0,13,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <Grid>
+                                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                                    <TextBlock Text="DNS resolution check" Style="{StaticResource CardTitleStyle}" />
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                        <TextBox Text="{Binding DnsLookupHost, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button Grid.Column="1" Content="Resolve" Command="{Binding ResolveDnsCommand}" Margin="10,4,0,8" />
+                                    </Grid>
+                                    <TextBlock Grid.Row="2" Text="{Binding DnsResolutionSummary}" TextWrapping="Wrap" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="RoutesPage" AutomationProperties.AutomationId="RoutesPage"
+                          Visibility="{Binding CurrentSection, Converter={StaticResource SectionVisibilityConverter}, ConverterParameter=Routes}">
+                        <StackPanel>
+                            <TextBlock Text="Route trace" AutomationProperties.AutomationId="RoutesHeading"
+                                       Style="{StaticResource SectionHeadingStyle}" />
+                            <TextBlock Text="Each row is a real TTL-limited ICMP response. Routers that do not answer are shown as timeouts."
+                                       Style="{StaticResource MutedTextStyle}" Margin="0,0,0,16" />
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding ProbeTargetLabel}" />
+                                    <TextBlock Text="Edit the probe host on the Dashboard or select an application profile."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,5,0,12" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="Trace route" AutomationProperties.Name="Trace route" Command="{Binding RunTraceCommand}"
+                                                Background="{DynamicResource AccentSoftBrush}" />
+                                        <Button Content="Cancel trace" Command="{Binding CancelTraceCommand}" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding RouteSummary}" Style="{StaticResource MutedTextStyle}" Margin="0,12,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <DataGrid ItemsSource="{Binding RouteHops}" Height="480" Margin="0,0,0,14">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="HOP" Binding="{Binding Hop}" Width="90" />
+                                    <DataGridTextColumn Header="ADDRESS" Binding="{Binding Address}" Width="2*" />
+                                    <DataGridTextColumn Header="LATENCY" Binding="{Binding LatencyMs, StringFormat={}{0:0.##} ms, TargetNullValue=Unavailable}" Width="*" />
+                                    <DataGridTextColumn Header="RESPONSE" Binding="{Binding Status}" Width="2*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="OptimizerPage" AutomationProperties.AutomationId="OptimizerPage"
+                          Visibility="{Binding CurrentSection, Converter={StaticResource SectionVisibilityConverter}, ConverterParameter=Optimizer}">
+                        <StackPanel>
+                            <TextBlock Text="Safe network optimizer" AutomationProperties.AutomationId="OptimizerHeading"
+                                       Style="{StaticResource SectionHeadingStyle}" />
+                            <TextBlock Text="No undocumented tweaks, packet interception, anti-cheat changes, security changes or automatic MTU/IPv6 changes."
+                                       Style="{StaticResource MutedTextStyle}" Margin="0,0,0,14" />
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Operation mode" Style="{StaticResource CardTitleStyle}" />
+                                    <ComboBox ItemsSource="{Binding OptimizerModes}" SelectedItem="{Binding OptimizerMode}" Width="200"
+                                              HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding AdministratorStatus}" Style="{StaticResource MutedTextStyle}" />
+                                    <TextBlock Text="SAFE is read-only. MANUAL displays each exact change and requires confirmation before creating a timestamped backup and applying it. RESTORE enables individual backup restoration."
+                                               TextWrapping="Wrap" Margin="0,8,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="IPv4 DNS servers" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="Current configuration" Style="{StaticResource MutedTextStyle}" />
+                                    <TextBlock Text="{Binding DnsStatus}" Margin="0,4,0,12" />
+                                    <TextBlock Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10">
+                                        <Run Text="Status: " /><Run Text="{Binding DnsOperationStatus, Mode=OneWay}" />
+                                    </TextBlock>
+                                    <TextBlock Text="Network adapter" Style="{StaticResource MutedTextStyle}" />
+                                    <ComboBox ItemsSource="{Binding Adapters}" SelectedItem="{Binding SelectedAdapter}"
+                                              DisplayMemberPath="Name" />
+                                    <TextBlock Text="Proposed primary DNS (IPv4)" Style="{StaticResource MutedTextStyle}" />
+                                    <TextBox Text="{Binding DnsPrimaryInput, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Text="Proposed secondary DNS (optional IPv4)" Style="{StaticResource MutedTextStyle}" />
+                                    <TextBox Text="{Binding DnsSecondaryInput, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Text="Why: use the user-selected resolvers for domain-name lookups. Benefit is not guaranteed. Possible side effects include different filtering, privacy, availability and name-resolution behavior. Administrator permission may be needed."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,2,0,12" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="Apply DNS change" Command="{Binding ApplyDnsCommand}"
+                                                Background="{DynamicResource AccentSoftBrush}" />
+                                        <Button Content="Restore last DNS backup"
+                                                Command="{Binding RestoreBackupCommand}"
+                                                CommandParameter="{Binding LatestDnsBackup}" />
+                                        <Button Content="Refresh settings" Command="{Binding RefreshOptimizerCommand}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Adapter selective suspend" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="{Binding SelectedAdapterSummary}" Style="{StaticResource MutedTextStyle}" />
+                                    <TextBlock Text="{Binding SelectiveSuspendStatus}" Margin="0,7,0,12" />
+                                    <TextBlock Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10">
+                                        <Run Text="Status: " /><Run Text="{Binding SelectiveSuspendOperationStatus, Mode=OneWay}" />
+                                    </TextBlock>
+                                    <TextBlock Text="Proposed value: Disabled. This can increase power use and heat. Supported adapters only; Windows NetAdapter cmdlets are used. Administrator permission may be required."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,0,0,12" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="Disable selective suspend" Command="{Binding ApplySelectiveSuspendCommand}"
+                                                Background="{DynamicResource AccentSoftBrush}" />
+                                        <Button Content="Restore last adapter backup"
+                                                Command="{Binding RestoreBackupCommand}"
+                                                CommandParameter="{Binding LatestSelectiveSuspendBackup}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Windows power plan" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="Current value" Style="{StaticResource MutedTextStyle}" />
+                                    <TextBlock Text="{Binding PowerPlanName}" Margin="0,4,0,12" />
+                                    <TextBlock Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10">
+                                        <Run Text="Status: " /><Run Text="{Binding PowerPlanOperationStatus, Mode=OneWay}" />
+                                    </TextBlock>
+                                    <TextBlock Text="Proposed value: High performance, only if the built-in plan is available. May increase electricity use, heat, fan noise and reduce battery life; it does not guarantee better network performance."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,0,0,12" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="Apply High performance plan" Command="{Binding ApplyPowerPlanCommand}"
+                                                Background="{DynamicResource AccentSoftBrush}" />
+                                        <Button Content="Restore last power plan backup"
+                                                Command="{Binding RestoreBackupCommand}"
+                                                CommandParameter="{Binding LatestPowerPlanBackup}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="MTU recommendation" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock>
+                                        <Run Text="Current IPv4 MTU: " />
+                                        <Run Text="{Binding SelectedAdapter.Mtu, TargetNullValue=Unavailable}" />
+                                    </TextBlock>
+                                    <TextBlock Text="The MTU is read from the selected interface. Investigate it only when you have a validated path-MTU issue; wetwiLAG never changes it automatically."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,7,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Before-and-after verification" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="{Binding OptimizerResult}" TextWrapping="Wrap" />
+                                    <TextBlock Text="Latency, jitter and loss use five actual ICMP samples to the configured probe. A missing measurement is shown as unavailable; normal variation is not presented as a guarantee."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,8,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Available restore points" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="Backups are immutable originals. Choose RESTORE mode to enable a verified per-setting rollback; failed restores preserve the original backup."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,0,0,12" />
+                                    <ItemsControl ItemsSource="{Binding Backups}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type models:OptimizerBackup}">
+                                                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+                                                        Padding="4,10">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding SettingName}" FontWeight="SemiBold" />
+                                                            <TextBlock Text="{Binding CreatedAt, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Style="{StaticResource MutedTextStyle}" />
+                                                            <TextBlock Text="{Binding OriginalValue}" Style="{StaticResource MutedTextStyle}" />
+                                                            <TextBlock Text="{Binding BackupFile}" Style="{StaticResource MutedTextStyle}" FontSize="10" />
+                                                        </StackPanel>
+                                                        <Button Grid.Column="1" Content="Restore this setting"
+                                                                Command="{Binding DataContext.RestoreBackupCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                                CommandParameter="{Binding}" VerticalAlignment="Center" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="No system changes are made in SAFE mode. The interface never elevates privileges or modifies security services, game files, registry tweaks, IPv6, MTU, adapters or routers."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,12,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="ProfilesPage" AutomationProperties.AutomationId="ProfilesPage"
+                          Visibility="{Binding CurrentSection, Converter={StaticResource SectionVisibilityConverter}, ConverterParameter=Profiles}">
+                        <StackPanel>
+                            <TextBlock Text="Application profiles" AutomationProperties.AutomationId="ProfilesHeading"
+                                       Style="{StaticResource SectionHeadingStyle}" />
+                            <TextBlock Text="Profiles save a probe host and preferred adapter for this app. They do not modify Windows network settings."
+                                       Style="{StaticResource MutedTextStyle}" Margin="0,0,0,18" />
+                            <Border Style="{StaticResource CardBorderStyle}" MaxWidth="900" HorizontalAlignment="Left">
+                                <StackPanel>
+                                    <TextBlock Text="Saved profiles" Style="{StaticResource CardTitleStyle}" />
+                                    <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}"
+                                              DisplayMemberPath="Name" />
+                                    <TextBlock Text="{Binding SelectedProfile.ProbeHost, TargetNullValue=No profile selected}" />
+                                    <TextBlock Text="{Binding SelectedProfile.PreferredAdapterName, TargetNullValue=Default adapter}" Style="{StaticResource MutedTextStyle}" Margin="0,4,0,14" />
+                                    <WrapPanel>
+                                        <Button Content="Create profile" Command="{Binding SaveProfileCommand}" />
+                                        <Button Content="Edit profile" Command="{Binding EditProfileCommand}" />
+                                        <Button Content="Delete profile" Command="{Binding DeleteProfileCommand}" />
+                                    </WrapPanel>
+                                    <TextBlock Text="Switching a profile updates the selected probe host and app adapter preference. System changes require the separate, explicitly confirmed Optimizer workflow."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,14,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="HistoryPage" AutomationProperties.AutomationId="HistoryPage"
+                          Visibility="{Binding CurrentSection, Converter={StaticResource SectionVisibilityConverter}, ConverterParameter=History}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,18">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Measurement history" AutomationProperties.AutomationId="HistoryHeading"
+                                               Style="{StaticResource SectionHeadingStyle}" />
+                                    <TextBlock Text="{Binding HistorySummary}" Style="{StaticResource MutedTextStyle}" />
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="Clear history" Command="{Binding ClearHistoryCommand}"
+                                        VerticalAlignment="Center" />
+                            </Grid>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Latency over time" Style="{StaticResource CardTitleStyle}" />
+                                    <Viewbox Height="145" Stretch="Fill">
+                                        <Canvas Width="600" Height="120" ClipToBounds="True">
+                                            <Line X1="0" Y1="110" X2="600" Y2="110" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1" />
+                                            <Polyline Points="{Binding HistoryChartPoints}" Stroke="{DynamicResource AccentBrush}"
+                                                      StrokeThickness="2.5" StrokeLineJoin="Round" />
+                                        </Canvas>
+                                    </Viewbox>
+                                    <TextBlock Text="Chart points are based on stored successful latency measurements only. Empty chart means no successful samples are available."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,10,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <DataGrid ItemsSource="{Binding History}" Height="440">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="TIME" Binding="{Binding Timestamp, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Width="2*" />
+                                    <DataGridTextColumn Header="TEST" Binding="{Binding TestType}" Width="2*" />
+                                    <DataGridTextColumn Header="TARGET" Binding="{Binding ProbeHost}" Width="2*" />
+                                    <DataGridTextColumn Header="LATENCY" Binding="{Binding AverageLatencyMs, StringFormat={}{0:0.##} ms, TargetNullValue=Unavailable}" Width="*" />
+                                    <DataGridTextColumn Header="JITTER" Binding="{Binding JitterMs, StringFormat={}{0:0.##} ms, TargetNullValue=Unavailable}" Width="*" />
+                                    <DataGridTextColumn Header="LOSS" Binding="{Binding PacketLossPercent, StringFormat={}{0:0.#}%}" Width="*" />
+                                    <DataGridTextColumn Header="REPLIES" Binding="{Binding Replies}" Width="*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="SettingsPage" AutomationProperties.AutomationId="SettingsPage"
+                          Visibility="{Binding CurrentSection, Converter={StaticResource SectionVisibilityConverter}, ConverterParameter=Settings}">
+                        <StackPanel>
+                            <TextBlock Text="Interface settings" AutomationProperties.AutomationId="SettingsHeading"
+                                       Style="{StaticResource SectionHeadingStyle}" />
+                            <TextBlock Text="Changes are applied immediately and saved locally. Layout presets can be selected, edited, renamed and deleted."
+                                       Style="{StaticResource MutedTextStyle}" Margin="0,0,0,18" />
+                            <UniformGrid Columns="2">
+                                <Border Style="{StaticResource CardBorderStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Appearance" Style="{StaticResource CardTitleStyle}" />
+                                        <TextBlock Text="Theme" Style="{StaticResource MutedTextStyle}" />
+                                        <ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme}" Width="170"
+                                                  HorizontalAlignment="Left" AutomationProperties.Name="Theme" />
+                                        <TextBlock Text="Accent color" Style="{StaticResource MutedTextStyle}" />
+                                        <ComboBox ItemsSource="{Binding AccentOptions}" SelectedItem="{Binding AccentColor}"
+                                                  Width="210" HorizontalAlignment="Left" AutomationProperties.Name="Accent color">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Border Width="18" Height="18" CornerRadius="9" Background="{Binding Converter={StaticResource HexBrushConverter}}" />
+                                                        <TextBlock Text="{Binding}" Margin="9,0,0,0" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                        <TextBlock Text="Interface scale" Style="{StaticResource MutedTextStyle}" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <Slider Value="{Binding Scale, UpdateSourceTrigger=PropertyChanged}"
+                                                    AutomationProperties.Name="Interface scale" />
+                                            <TextBlock Grid.Column="1" Text="{Binding ScaleLabel}" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                        </Grid>
+                                        <TextBlock Text="The scale changes the entire interface, including controls and navigation."
+                                                   Style="{StaticResource MutedTextStyle}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource CardBorderStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Navigation" Style="{StaticResource CardTitleStyle}" />
+                                        <CheckBox Content="Show sidebar" AutomationProperties.Name="Show sidebar" IsChecked="{Binding SidebarVisible}" />
+                                        <CheckBox Content="Collapse sidebar to icons" AutomationProperties.Name="Collapse sidebar" IsChecked="{Binding SidebarCollapsed}" />
+                                        <CheckBox Content="Position sidebar on the right" AutomationProperties.Name="Sidebar on right" IsChecked="{Binding SidebarOnRight}" />
+                                        <TextBlock Text="The sidebar position, visibility and collapsed state persist after restart."
+                                                   Style="{StaticResource MutedTextStyle}" Margin="0,9,0,0" />
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Dashboard widgets" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="Hidden widgets can be restored here. Drag visible widgets on the Dashboard to reorder them; use the resize and hide buttons on each card."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,0,0,10" />
+                                    <ItemsControl ItemsSource="{Binding HiddenWidgets}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <DockPanel Margin="0,4">
+                                                    <Button DockPanel.Dock="Right" Content="Restore"
+                                                            Command="{Binding DataContext.RestoreWidgetCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                                            CommandParameter="{Binding}" />
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="No hidden widgets." Foreground="{DynamicResource MutedText}"
+                                               Visibility="{Binding HiddenWidgets.Count, Converter={StaticResource StateVisibilityConverter}, ConverterParameter=Invert}" />
+                                    <Button Content="Reset layout to defaults" Command="{Binding ResetLayoutCommand}"
+                                            HorizontalAlignment="Left" Margin="0,13,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Layout presets" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="Presets capture the current theme, accent, scaling, sidebar and widget layout."
+                                               Style="{StaticResource MutedTextStyle}" Margin="0,0,0,10" />
+                                    <ComboBox ItemsSource="{Binding LayoutPresets}" SelectedItem="{Binding SelectedPreset}"
+                                              DisplayMemberPath="Name" Width="320" HorizontalAlignment="Left" />
+                                    <WrapPanel>
+                                        <Button Content="Create" Command="{Binding CreatePresetCommand}" />
+                                        <Button Content="Apply" Command="{Binding ApplyPresetCommand}" />
+                                        <Button Content="Update" Command="{Binding UpdatePresetCommand}" />
+                                        <Button Content="Rename" Command="{Binding RenamePresetCommand}" />
+                                        <Button Content="Delete" Command="{Binding DeletePresetCommand}" />
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Storage and privacy" Style="{StaticResource CardTitleStyle}" />
+                                    <TextBlock Text="Settings, profiles, diagnostics history, operation records and immutable optimizer backups are stored under %LOCALAPPDATA%\\wetwiLAG. Network probes target only the host shown in the app."
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
+
+            <Border Grid.Row="2" Background="{DynamicResource SidebarBackground}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="17,9">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="2*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource MutedTextStyle}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding ErrorMessage}" Foreground="{DynamicResource DangerBrush}"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Visibility="{Binding HasError, Converter={StaticResource StateVisibilityConverter}}" />
+                    <TextBlock Grid.Column="2" Text="{Binding AdministratorStatus}" Style="{StaticResource MutedTextStyle}"
+                               VerticalAlignment="Center" FontSize="10" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
